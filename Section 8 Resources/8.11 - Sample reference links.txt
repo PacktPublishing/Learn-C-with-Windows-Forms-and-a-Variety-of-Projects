@@ -1,0 +1,5 @@
+Sample Image file from Pixabay
+https://cdn.pixabay.com/photo/2019/12/25/09/23/north-4718160__340.jpg
+
+Sample online PDF File
+https://file-examples-com.github.io/uploads/2017/10/file-sample_150kB.pdf

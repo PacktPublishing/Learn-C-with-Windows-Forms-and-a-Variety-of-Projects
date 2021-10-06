@@ -1,0 +1,99 @@
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+using System.Drawing.Printing;
+using System.Collections.Generic;
+
+namespace Lesson49ListsPart1
+{
+    public partial class Form1 : Form
+    {
+        private int imageIndex = 0;
+        private List<Image> images = new List<Image>();
+        public Form1()
+        {
+            InitializeComponent();
+        }
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            images.Clear();
+            try
+            {
+                openFileDialog1.ShowDialog();
+
+                foreach (string i in openFileDialog1.FileNames)
+                    images.Add(Image.FromFile(i));
+
+
+                pictureBox1.Image = images[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void btnForward_Click(object sender, EventArgs e)
+        {
+            if (imageIndex <= images.Count - 2)
+                pictureBox1.Image =images[++imageIndex];
+            else
+                MessageBox.Show("End Reached!");
+        }
+        private void btnBackward_Click(object sender, EventArgs e)
+        {
+            if (imageIndex > 0)
+                pictureBox1.Image = images[--imageIndex];
+            else
+                MessageBox.Show("Beginning Reached!");
+        }
+        private void btnPrint_Click(object sender, EventArgs e)
+        {
+            if (printDialog1.ShowDialog() == DialogResult.OK)
+                printDocument1.Print();
+        }
+
+        private void printDocument1_PrintPage(object sender, PrintPageEventArgs e)
+        {
+            if (images.Count > 0)
+            {
+                lblMargins.Text =
+                         $"Width: {e.MarginBounds.Width}" +
+                         $"\nHeight: {e.MarginBounds.Height}" +
+                         $"\nPicture Height:{images[imageIndex].Height}" +
+                         $"\nPicture Width: {images[imageIndex].Width}";
+
+                int x = (int)numericUpDown1.Value, y = (int)numericUpDown2.Value;
+                Image i = images[imageIndex];
+                int rectWidth = e.MarginBounds.Width;
+                int rectHeight = e.MarginBounds.Height;
+
+                if (i.Width >= rectWidth && i.Height <= rectHeight)
+                    e.Graphics.DrawImage(i, x, y, rectWidth - x, (float)(rectWidth - x) / i.Width * i.Height);
+
+                else if (i.Height >= rectHeight && i.Width <= rectWidth)
+                    e.Graphics.DrawImage(i, x, y, (float)(rectHeight - y) / i.Height * i.Width, rectHeight - y);
+
+                else if (i.Width >= rectWidth && i.Width >= i.Height)
+                    e.Graphics.DrawImage(i, x, y, rectWidth - x, (float)(rectWidth - x) / i.Width * i.Height);
+            }
+        }
+
+        private void btnPrintPreview_Click(object sender, EventArgs e)
+        {
+            printPreviewDialog1.Document = printDocument1;
+            printPreviewDialog1.ShowDialog();
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog1.FileNames.Length > 0)
+            {
+                Form f = new Form();
+                f.BackgroundImageLayout = ImageLayout.Zoom;
+                f.BackgroundImage = Image.FromFile(openFileDialog1.FileNames[imageIndex]);
+                f.Show();
+            }
+        }
+    }
+}
+
